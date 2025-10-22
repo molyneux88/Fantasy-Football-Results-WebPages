@@ -45,7 +45,7 @@ function loadDashboard(baseUrl) {
         iframe.style.overflow = "auto";           // ensure scrollbars appear
       }
 
-      // Set vizDiv height to match full Tableau viz height
+      // Set vizDiv height to match full Tableau viz heightas
       try {
         const fullHeight = currentViz.getVizHeight();
         vizDiv.style.height = fullHeight + "px";
