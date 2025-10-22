@@ -2,6 +2,7 @@ let currentViz = null;
 let currentVizUrl = null;
 const loader = document.getElementById("loader");
 const container = document.getElementById("vizContainer");
+
 const MIN_LOADER_DURATION = 700; // ms
 
 function getDeviceParam() {
@@ -9,6 +10,7 @@ function getDeviceParam() {
 }
 
 function showLoader() { loader.classList.add("active"); }
+
 function hideLoader(startTime) {
   const elapsed = Date.now() - startTime;
   const remaining = Math.max(MIN_LOADER_DURATION - elapsed, 0);
@@ -21,34 +23,37 @@ function loadDashboard(baseUrl) {
 
   showLoader();
   const loaderStart = Date.now();
-
-  // Clear previous viz
   container.innerHTML = "";
 
   const vizDiv = document.createElement("div");
-  vizDiv.classList.add("vizFrame");
+  vizDiv.className = "vizFrame";
   container.appendChild(vizDiv);
 
-  // Tableau viz
+  // Create Tableau viz
   currentViz = new tableau.Viz(vizDiv, url, {
     hideTabs: true,
     hideToolbar: true,
     width: "100%",
-    height: "800px", // initial placeholder height
+    height: "800px",
     onFirstInteractive: function() {
-      // Enable scrolling
       const iframe = vizDiv.querySelector("iframe");
+
       if (iframe) {
         iframe.setAttribute("scrolling", "yes");
         iframe.style.overflow = "auto";
-      }
+        iframe.style.width = "100%";
+        iframe.style.maxWidth = "100%";
 
-      // Adjust vizDiv height to actual viz
-      try {
-        const fullHeight = currentViz.getVizHeight();
-        vizDiv.style.height = fullHeight + "px";
-      } catch(e) {
-        console.warn("Failed to get viz height:", e);
+        // Adjust height dynamically
+        try {
+          const vizHeight = currentViz.getVizHeight();
+          vizDiv.style.height = vizHeight + "px";
+          iframe.style.height = vizHeight + "px";
+        } catch (err) {
+          console.warn("Couldn't get viz height:", err);
+          vizDiv.style.height = "900px";
+          iframe.style.height = "900px";
+        }
       }
 
       vizDiv.classList.add("active");
@@ -58,7 +63,7 @@ function loadDashboard(baseUrl) {
   });
 }
 
-// Nav button click
+// Nav button logic
 document.querySelectorAll(".nav button").forEach(btn => {
   const baseUrl = btn.getAttribute("data-url");
   btn.addEventListener("click", () => {
@@ -68,14 +73,14 @@ document.querySelectorAll(".nav button").forEach(btn => {
   });
 });
 
-// Load first dashboard on DOM ready
+// Initial load
 document.addEventListener("DOMContentLoaded", () => {
   const firstButton = document.querySelector(".nav button");
   firstButton.classList.add("active");
   loadDashboard(firstButton.getAttribute("data-url"));
 });
 
-// Reload dashboard on window resize to switch phone/desktop layout
+// Reload when resizing (switch between desktop/phone)
 window.addEventListener("resize", () => {
   if (currentVizUrl) {
     const baseUrl = document.querySelector(".nav button.active").getAttribute("data-url");

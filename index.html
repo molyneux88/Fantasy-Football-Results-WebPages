@@ -2,11 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>My Tableau Dashboards</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
+  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
 </head>
 <body>
-
   <div class="nav">
     <button data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true">Gameweek Winners</button>
     <button data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
@@ -14,14 +15,12 @@
     <button data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true">Transfers</button>
   </div>
 
+  <div id="loader">Loading dashboard...</div>
+
   <div class="vizWrapper">
     <div id="vizContainer"></div>
   </div>
 
-  <div id="loader">Loading dashboard...</div>
-
-  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
   <script src="script.js"></script>
-
 </body>
 </html>
