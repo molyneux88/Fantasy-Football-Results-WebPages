@@ -9,7 +9,6 @@ function getDeviceParam() {
 }
 
 function showLoader() { loader.classList.add("active"); }
-
 function hideLoader(startTime) {
   const elapsed = Date.now() - startTime;
   const remaining = Math.max(MIN_LOADER_DURATION - elapsed, 0);
@@ -26,26 +25,25 @@ function loadDashboard(baseUrl) {
   // Clear previous viz
   container.innerHTML = "";
 
-  // Create div for Tableau viz
   const vizDiv = document.createElement("div");
   vizDiv.classList.add("vizFrame");
   container.appendChild(vizDiv);
 
-  // Initialize Tableau viz
+  // Tableau viz
   currentViz = new tableau.Viz(vizDiv, url, {
     hideTabs: true,
     hideToolbar: true,
     width: "100%",
-    height: "800px", // temporary height for initial rendering
+    height: "800px", // initial placeholder height
     onFirstInteractive: function() {
-      // Grab the iframe Tableau created
+      // Enable scrolling
       const iframe = vizDiv.querySelector("iframe");
       if (iframe) {
-        iframe.setAttribute("scrolling", "yes");  // allow scroll
-        iframe.style.overflow = "auto";           // ensure scrollbars appear
+        iframe.setAttribute("scrolling", "yes");
+        iframe.style.overflow = "auto";
       }
 
-      // Set vizDiv height to match full Tableau viz heightas
+      // Adjust vizDiv height to actual viz
       try {
         const fullHeight = currentViz.getVizHeight();
         vizDiv.style.height = fullHeight + "px";
@@ -53,7 +51,6 @@ function loadDashboard(baseUrl) {
         console.warn("Failed to get viz height:", e);
       }
 
-      // Fade in
       vizDiv.classList.add("active");
       hideLoader(loaderStart);
       currentVizUrl = url;
@@ -61,7 +58,7 @@ function loadDashboard(baseUrl) {
   });
 }
 
-// Nav buttons click
+// Nav button click
 document.querySelectorAll(".nav button").forEach(btn => {
   const baseUrl = btn.getAttribute("data-url");
   btn.addEventListener("click", () => {
@@ -78,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadDashboard(firstButton.getAttribute("data-url"));
 });
 
-// Reload dashboard on window resize to switch mobile/desktop layout
+// Reload dashboard on window resize to switch phone/desktop layout
 window.addEventListener("resize", () => {
   if (currentVizUrl) {
     const baseUrl = document.querySelector(".nav button.active").getAttribute("data-url");
