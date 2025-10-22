@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Fantasy Football Tableau Dashboards</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Navigation -->
+  <div class="nav">
+    <button data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true">
+      Gameweek Winners
+    </button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">
+      Gameweek Tables
+    </button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">
+      Booster Chip Tables
+    </button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true">
+      Transfers
+    </button>
+  </div>
+
+  <!-- Viz wrapper -->
+  <div class="vizWrapper">
+    <div id="vizContainer"></div>
+  </div>
+
+  <!-- Loader -->
+  <div id="loader" class="active">Loading dashboard...</div>
+
+  <!-- Tableau API -->
+  <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
