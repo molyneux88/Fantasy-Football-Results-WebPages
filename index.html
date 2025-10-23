@@ -1,28 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>My Tableau Dashboards</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fantasy Dashboard</title>
+
+  <!-- stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Tableau API -->
   <script src="https://public.tableau.com/javascripts/api/tableau-2.min.js"></script>
 </head>
 <body>
-  <div class="nav">
-    <button data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true" data-key="GameweekWinners">Gameweek Winners</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true" data-key="GameweekTables">Gameweek Tables</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true" data-key="ChipTables" >Booster Chip Tables</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true" data-key="TransferStats" >Transfers</button>
-  </div>
 
-  <div id="loader">Loading dashboard...</div>
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-left">
+      <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'"/>
+      <div class="brand">
+        <div class="brand-title">Fantasy Dashboard</div>
+        <div class="brand-sub">Transfers & Gameweeks</div>
+      </div>
+    </div>
 
+    <!-- desktop top nav (visible on wide screens) -->
+    <nav class="top-nav">
+      <button class="top-nav-btn" data-key="GameweekWinners" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true">Gameweek Winners</button>
+      <button class="top-nav-btn" data-key="GameweekTables" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
+      <button class="top-nav-btn" data-key="ChipTables" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
+      <div class="top-nav-group">
+        <button class="top-nav-btn has-children">Transfers ▾</button>
+        <div class="top-nav-children">
+          <button class="top-nav-btn" data-key="TransfersOverview" data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true">Overview</button>
+          <button class="top-nav-btn" data-key="Footballers" data-url="">Footballers</button>
+          <button class="top-nav-btn" data-key="Players" data-url="">Players</button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- hamburger (mobile) -->
+    <button id="hamburger" class="hamburger" aria-label="Open menu">
+      <span></span><span></span><span></span>
+    </button>
+  </header>
+
+  <!-- SLIDING DRAWER (mobile menu) -->
+  <aside id="drawer" class="drawer" aria-hidden="true">
+    <div class="drawer-inner">
+      <div class="drawer-header">
+        <img src="logo.png" alt="Logo" class="drawer-logo" onerror="this.style.display='none'"/>
+        <button id="drawer-close" class="drawer-close" aria-label="Close menu">✕</button>
+      </div>
+
+      <nav class="drawer-nav">
+        <button class="drawer-link" data-key="GameweekWinners" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true">Gameweek Winners</button>
+        <button class="drawer-link" data-key="GameweekTables" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
+        <button class="drawer-link" data-key="ChipTables" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
+
+        <div class="drawer-group">
+          <button class="drawer-toggle">Transfers ▾</button>
+          <div class="drawer-sub">
+            <button class="drawer-link" data-key="TransfersOverview" data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true">Overview</button>
+            <button class="drawer-link" data-key="Footballers" data-url="">Footballers</button>
+            <button class="drawer-link" data-key="Players" data-url="">Players</button>
+            <button class="drawer-link" data-key="BoosterFree" data-url="">Booster Free</button>
+            <button class="drawer-link" data-key="BoosterChips" data-url="">Booster Chips</button>
+
+            <div class="drawer-sub-group">
+              <button class="drawer-toggle small">Time ▾</button>
+              <div class="drawer-sub-sub">
+                <button class="drawer-link" data-key="TimeHours" data-url="">Hours</button>
+                <button class="drawer-link" data-key="TimeDays" data-url="">Days</button>
+                <button class="drawer-link" data-key="TimeMonths" data-url="">Months</button>
+                <button class="drawer-link" data-key="TimeDates" data-url="">Dates</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </nav>
+
+      <div class="drawer-footer">
+        <small>© Fantasy Dashboard</small>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Loader -->
+  <div id="loader" class="loader">Loading dashboard...</div>
+
+  <!-- Viz area (scroll container) -->
   <div class="vizWrapper">
     <div class="vizScrollContainer">
       <div id="vizContainer"></div>
     </div>
   </div>
 
+  <!-- script -->
   <script src="script.js"></script>
 </body>
 </html>
