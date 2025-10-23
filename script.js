@@ -2,88 +2,109 @@ let currentViz = null;
 let currentVizUrl = null;
 const loader = document.getElementById("loader");
 const container = document.getElementById("vizContainer");
+const scrollContainer = document.querySelector(".vizScrollContainer");
+const MIN_LOADER_DURATION = 700;
 
-const MIN_LOADER_DURATION = 700; // ms
+// ==========================
+// --- DASHBOARD HEIGHTS ---
+// Add your dashboards here, key = data-key attribute, value = desired height in px
+const vizHeights = {
+  "GameweekWinners": 1600,
+  "GameweekTables": 1800,
+  "ChipTables": 1200,
+  "TransferStats": 2000
+};
+// ==========================
 
 function getDeviceParam() {
   return window.innerWidth <= 768 ? "&:device=phone" : "&:device=desktop";
 }
 
 function showLoader() { loader.classList.add("active"); }
-
 function hideLoader(startTime) {
   const elapsed = Date.now() - startTime;
   const remaining = Math.max(MIN_LOADER_DURATION - elapsed, 0);
   setTimeout(() => loader.classList.remove("active"), remaining);
 }
 
-function loadDashboard(baseUrl) {
+function safeDisposeViz() {
+  try { if (currentViz?.dispose) currentViz.dispose(); } catch {}
+  currentViz = null;
+}
+
+function loadDashboard(baseUrl, key) {
   const url = baseUrl + getDeviceParam();
   if (url === currentVizUrl) return;
 
   showLoader();
   const loaderStart = Date.now();
+  safeDisposeViz();
   container.innerHTML = "";
 
+  // --- Set height from predefined map ---
+  const height = vizHeights[key] || window.innerHeight;
+  scrollContainer.style.height = height + "px";
+
+  // --- Create viz container ---
   const vizDiv = document.createElement("div");
-  vizDiv.className = "vizFrame";
+  vizDiv.classList.add("vizFrame");
   container.appendChild(vizDiv);
 
-  // Create Tableau viz
+  // --- Load Tableau viz ---
   currentViz = new tableau.Viz(vizDiv, url, {
     hideTabs: true,
     hideToolbar: true,
     width: "100%",
-    height: "800px",
-    onFirstInteractive: function() {
-      const iframe = vizDiv.querySelector("iframe");
+    height: height + "px",
+  });
 
-      if (iframe) {
-        iframe.setAttribute("scrolling", "yes");
-        iframe.style.overflow = "auto";
-        iframe.style.width = "100%";
-        iframe.style.maxWidth = "100%";
+  // --- Poll for iframe to remove its internal scroll ---
+  const waitForViz = setInterval(() => {
+    const iframe = vizDiv.querySelector("iframe");
+    if (iframe) {
+      clearInterval(waitForViz);
+      iframe.setAttribute("scrolling", "no"); // disables iframe scroll
+      iframe.style.width = "100%";
+      iframe.style.height = height + "px";
 
-        // Adjust height dynamically
-        try {
-          const vizHeight = currentViz.getVizHeight();
-          vizDiv.style.height = vizHeight + "px";
-          iframe.style.height = vizHeight + "px";
-        } catch (err) {
-          console.warn("Couldn't get viz height:", err);
-          vizDiv.style.height = "900px";
-          iframe.style.height = "900px";
-        }
-      }
-
-      vizDiv.classList.add("active");
+      vizDiv.classList.add("active");          // fade-in
       hideLoader(loaderStart);
       currentVizUrl = url;
     }
-  });
+  }, 200);
 }
 
-// Nav button logic
+// --- Nav buttons ---
 document.querySelectorAll(".nav button").forEach(btn => {
-  const baseUrl = btn.getAttribute("data-url");
   btn.addEventListener("click", () => {
     document.querySelectorAll(".nav button").forEach(b => b.classList.remove("active"));
     btn.classList.add("active");
-    loadDashboard(baseUrl);
+    const key = btn.getAttribute("data-key");
+    loadDashboard(btn.getAttribute("data-url"), key);
   });
 });
 
-// Initial load
+// --- Load first dashboard ---
 document.addEventListener("DOMContentLoaded", () => {
   const firstButton = document.querySelector(".nav button");
-  firstButton.classList.add("active");
-  loadDashboard(firstButton.getAttribute("data-url"));
+  if (firstButton) {
+    firstButton.classList.add("active");
+    const key = firstButton.getAttribute("data-key");
+    loadDashboard(firstButton.getAttribute("data-url"), key);
+  }
 });
 
-// Reload when resizing (switch between desktop/phone)
+// --- Resize: reload for device switch ---
+let resizeTimer = null;
 window.addEventListener("resize", () => {
-  if (currentVizUrl) {
-    const baseUrl = document.querySelector(".nav button.active").getAttribute("data-url");
-    loadDashboard(baseUrl);
-  }
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (currentVizUrl) {
+      const activeBtn = document.querySelector(".nav button.active");
+      if (activeBtn) {
+        const key = activeBtn.getAttribute("data-key");
+        loadDashboard(activeBtn.getAttribute("data-url"), key);
+      }
+    }
+  }, 400);
 });

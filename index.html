@@ -9,16 +9,18 @@
 </head>
 <body>
   <div class="nav">
-    <button data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true">Gameweek Winners</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
-    <button data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true">Transfers</button>
+    <button data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekWinners?:showVizHome=no&:embed=true" data-key="GameweekWinners">Gameweek Winners</button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true" data-key="GameweekTables">Gameweek Tables</button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true" data-key="ChipTables" >Booster Chip Tables</button>
+    <button data-url="https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true" data-key="TransferStats" >Transfers</button>
   </div>
 
   <div id="loader">Loading dashboard...</div>
 
   <div class="vizWrapper">
-    <div id="vizContainer"></div>
+    <div class="vizScrollContainer">
+      <div id="vizContainer"></div>
+    </div>
   </div>
 
   <script src="script.js"></script>
