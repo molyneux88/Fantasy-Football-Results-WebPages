@@ -1,7 +1,9 @@
-/* script.js
-   - hamburger drawer
-   - nested submenu toggles
-   - integrates with Tableau viz loader & per-viz height map
+/* script.js (updated)
+   - robust drawer toggle
+   - submenu toggles
+   - unified click handler for elements with data-url
+   - active highlighting (syncs by data-key)
+   - closes drawer after selection on mobile
 */
 
 let currentViz = null;
@@ -14,19 +16,15 @@ const hamburger = document.getElementById('hamburger');
 const drawerClose = document.getElementById('drawer-close');
 const MIN_LOADER_DURATION = 700; // ms
 
-// ==========================
-// --- DASHBOARD HEIGHTS ---
-// Add/adjust heights (px) for each dashboard key below.
-// Keys must match the data-key attributes on buttons.
+// Small map of heights (optional)
 const vizHeights = {
   "GameweekWinners": 1600,
   "GameweekTables": 1800,
   "ChipTables": 1200,
   "TransfersOverview": 2000,
-  // add your custom keys & heights here
 };
-// ==========================
 
+// utils
 function getDeviceParam() {
   return window.innerWidth <= 768 ? '&:device=phone' : '&:device=desktop';
 }
@@ -44,75 +42,112 @@ function safeDisposeViz(){
   currentViz = null;
 }
 
-// --- OPEN / CLOSE DRAWER
-hamburger.addEventListener('click', ()=>{ drawer.classList.add('open'); drawer.setAttribute('aria-hidden','false'); });
-drawerClose.addEventListener('click', ()=>{ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); });
+// --------------------
+// Drawer open/close (toggle now)
+function openDrawer(){
+  drawer.classList.add('open');
+  drawer.setAttribute('aria-hidden','false');
+}
+function closeDrawer(){
+  drawer.classList.remove('open');
+  drawer.setAttribute('aria-hidden','true');
+}
+function toggleDrawer(){
+  drawer.classList.toggle('open');
+  drawer.setAttribute('aria-hidden', drawer.classList.contains('open') ? 'false' : 'true');
+}
 
-// close drawer if user taps backdrop (click outside inner)
+hamburger.addEventListener('click', (e)=>{ e.stopPropagation(); toggleDrawer(); });
+drawerClose.addEventListener('click', ()=>{ closeDrawer(); });
+
+// close drawer when clicking outside inner area
 drawer.addEventListener('click', (e)=>{
-  if (e.target === drawer){ drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true'); }
+  if (e.target === drawer) closeDrawer();
 });
 
-// collapsible groups inside drawer
+// --------------------
+// drawer submenu toggles (works for drawer-toggle class)
 document.addEventListener('click', (e)=>{
-  // handle drawer toggles
   const toggle = e.target.closest('.drawer-toggle');
   if (toggle){
+    e.preventDefault();
+    e.stopPropagation();
     toggle.classList.toggle('open');
     const next = toggle.nextElementSibling;
     if (next) next.style.display = toggle.classList.contains('open') ? 'flex' : 'none';
-    e.preventDefault(); return;
+    return;
   }
 
-  // small nested toggles
   const smallToggle = e.target.closest('.drawer-toggle.small');
   if (smallToggle){
+    e.preventDefault();
+    e.stopPropagation();
     smallToggle.classList.toggle('open');
     const next = smallToggle.nextElementSibling;
     if (next) next.style.display = smallToggle.classList.contains('open') ? 'flex' : 'none';
-    e.preventDefault(); return;
+    return;
   }
 });
 
-// --- NAV BUTTONS (drawer + top-nav unified handler)
-// handler will look for data-url on clicked element
+// --------------------
+// Attach nav handlers for any element that has a data-url attribute
 function attachNavHandlers(){
-  // all elements that can trigger a viz have data-url
   document.querySelectorAll('[data-url]').forEach(btn=>{
+    // ensure we don't double-attach
+    if (btn.__navBound) return;
+    btn.__navBound = true;
+
     btn.addEventListener('click', (e)=>{
-      const url = btn.getAttribute('data-url');
+      e.stopPropagation();
+
+      const url = btn.getAttribute('data-url') || '';
       const key = btn.getAttribute('data-key') || null;
+
+      // remove active state from everything
+    document.querySelectorAll('.top-nav-btn, .drawer-link').forEach(el=>el.classList.remove('active'));
+
+    // set active on all elements that share the same data-key
+    if (key) {
+        document.querySelectorAll(`[data-key="${key}"]`).forEach(el=>el.classList.add('active'));
+    } else {
+        btn.classList.add('active');
+    }
+
+      // if no URL (placeholder), just close drawer and return
       if (!url || url.trim() === '') {
-        // no url assigned — simply close drawer (for placeholder entries)
-        drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+        closeDrawer();
         return;
       }
-      // visual active markers (top nav)
-      document.querySelectorAll('.top-nav-btn, .drawer-link').forEach(el=>el.classList.remove('active'));
-      btn.classList.add('active');
 
       // load the viz
       loadDashboard(url, key);
 
-      // close drawer on mobile for a clean experience
-      drawer.classList.remove('open'); drawer.setAttribute('aria-hidden','true');
+      // close drawer on mobile after a selection for clean UX
+      closeDrawer();
     });
   });
 }
 
-// --- LOAD DASHBOARD (uses vizHeights mapping)
+// --------------------
+// Load a Tableau viz (keeps the same height map approach)
 function loadDashboard(baseUrl, key){
   const url = baseUrl + getDeviceParam();
-  if (url === currentVizUrl) return;
+  if (url === currentVizUrl) {
+    console.log('same viz, skip reload');
+    return;
+  }
+
   showLoader();
   const loaderStart = Date.now();
 
   safeDisposeViz();
   container.innerHTML = '';
 
-  // compute height
+  // compute height from vizHeights (fallback to viewport)
   const height = (key && vizHeights[key]) ? vizHeights[key] : Math.max(window.innerHeight, 900);
+
   // set scroll container height so outer scrollbar appears
+  // use viewport height so page can scroll if viz is taller
   scrollContainer.style.height = Math.max(window.innerHeight, 400) + 'px';
 
   const vizDiv = document.createElement('div');
@@ -120,7 +155,7 @@ function loadDashboard(baseUrl, key){
   vizDiv.style.minHeight = height + 'px';
   container.appendChild(vizDiv);
 
-  // create tableau viz; height parameter helps tableau set initial size
+  // create Tableau viz
   currentViz = new tableau.Viz(vizDiv, url, {
     hideTabs: true,
     hideToolbar: true,
@@ -128,53 +163,64 @@ function loadDashboard(baseUrl, key){
     height: height + 'px'
   });
 
-  // wait for iframe to appear, then force it to our height and hide its internal scroll
+  // wait for iframe then force attributes
   const waitForIframe = setInterval(()=>{
     const iframe = vizDiv.querySelector('iframe');
     if (iframe){
       clearInterval(waitForIframe);
       try {
-        iframe.setAttribute('scrolling', 'no');
+        iframe.setAttribute('scrolling', 'no'); // disable internal scroll
         iframe.style.width = '100%';
         iframe.style.height = height + 'px';
         iframe.style.overflow = 'hidden';
-      } catch(e){ console.warn(e); }
+      } catch(e){ console.warn('iframe styling failed', e); }
 
-      // set vizDiv/viz container heights to exact height (ensures outer scroll works)
+      // ensure container heights match so outer scroll works
       vizDiv.style.height = height + 'px';
       container.style.height = height + 'px';
-      // ensure outer scroll container can scroll (height = viewport)
       scrollContainer.style.height = Math.max(window.innerHeight, 400) + 'px';
 
       setTimeout(()=>{
         vizDiv.classList.add('active');
         hideLoader(loaderStart);
         currentVizUrl = url;
-      }, 400);
+      }, 300);
     }
-  }, 180);
+  }, 160);
 }
 
-// attach handlers on ready
+// --------------------
+// Init on DOM ready
 document.addEventListener('DOMContentLoaded', ()=>{
   attachNavHandlers();
-  // preload first viz key from first clickable with data-url
-  const first = document.querySelector('[data-url]');
-  if (first){ first.classList.add('active'); const key = first.getAttribute('data-key'); loadDashboard(first.getAttribute('data-url'), key); }
+
+  // auto-load first data-url element (prefer top-nav if present)
+  const firstTop = document.querySelector('.top-nav-btn[data-url]');
+  const firstDrawer = document.querySelector('.drawer-link[data-url]');
+  const first = firstTop || firstDrawer || document.querySelector('[data-url]');
+  if (first){
+    // set active for same-key elements
+    const key = first.getAttribute('data-key') || null;
+    if (key) document.querySelectorAll(`[data-key="${key}"]`).forEach(el=>el.classList.add('active'));
+    else first.classList.add('active');
+
+    loadDashboard(first.getAttribute('data-url'), key);
+  }
 });
 
-// responsive: when resizing, re-load if needed (debounced)
+// --------------------
+// Responsive reload on resize (debounced)
 let resizeTimer = null;
 window.addEventListener('resize', ()=>{
   clearTimeout(resizeTimer);
   resizeTimer = setTimeout(()=>{
-    // if there's a current viz, reload it with the correct device param and height
     if (currentVizUrl){
+      // reload active one so Tableau can switch phone/desktop layout correctly
       const active = document.querySelector('[data-url].active');
       if (active) {
-        const key = active.getAttribute('data-key');
+        const key = active.getAttribute('data-key') || null;
         loadDashboard(active.getAttribute('data-url'), key);
       }
     }
-  }, 450);
+  }, 400);
 });
