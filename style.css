@@ -58,7 +58,7 @@ html,body{height:100%;margin:0;background:var(--bg);font-family:Inter,system-ui,
 .drawer-nav{display:flex;flex-direction:column;gap:6px}
 .drawer-link{background:transparent;border:0;color:var(--muted);text-align:left;padding:10px 12px;border-radius:8px;cursor:pointer;font-size:15px}
 .drawer-link:hover{background:rgba(255,255,255,0.03)}
-.drawer-toggle{background:transparent;border:0;color:var(--muted);padding:10px 12px;text-align:left;cursor:pointer;border-radius:8px;font-weight:600}
+.drawer-toggle{background:transparent;border:0;color:var(--muted);padding:10px 12px;text-align:left;cursor:pointer;border-radius:8px;font-size:15px;font-weight:600}
 .drawer-sub{display:none;padding-left:8px;margin-top:4px;flex-direction:column;gap:4px}
 .drawer-sub-group .drawer-sub-sub{display:none;padding-left:8px;margin-top:6px;flex-direction:column;gap:4px}
 

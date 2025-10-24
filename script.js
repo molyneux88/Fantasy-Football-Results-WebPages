@@ -18,10 +18,18 @@ const MIN_LOADER_DURATION = 700; // ms
 
 // Small map of heights (optional)
 const vizHeights = {
-  "GameweekWinners": 1600,
-  "GameweekTables": 1800,
-  "ChipTables": 1200,
-  "TransfersOverview": 2000,
+  "GameweekWinners": 2000,
+  "GameweekTables": 1000,
+  "ChipTables": 2000,
+  "TransfersOverview": 2500,
+  "TransfersFootballers": 6000,
+  "TransfersPlayers": 2800,
+  "TransfersChipFree": 1900,
+  "TransfersChip": 1000,
+  "TransfersTimeHours": 1300,
+  "TransfersTimeDays": 1500,
+  "TransfersTimeMonths": 1500,
+  "TransfersTimeDate": 6000,
 };
 
 // utils
