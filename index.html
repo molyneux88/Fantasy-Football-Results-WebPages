@@ -26,6 +26,7 @@
     <!-- desktop top nav (visible on wide screens) -->
     <nav class="top-nav">
       <button class="top-nav-btn" data-key="GameweekWinners" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Winners</button>
+      <button class="top-nav-btn" data-key="GameweekWeekWinners" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekWinnersTablesDashboard/GameweekWinnersTables:showVizHome=no&:embed=true">Gameweek Winners</button>
       <button class="top-nav-btn" data-key="GameweekTables" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
       <button class="top-nav-btn" data-key="ChipTables" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
       <div class="top-nav-group">
@@ -53,9 +54,15 @@
       </div>
 
       <nav class="drawer-nav">
-        <button class="drawer-link" data-key="GameweekWinners" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Winners</button>
-        <button class="drawer-link" data-key="GameweekTables" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Gameweek Tables</button>
-        <button class="drawer-link" data-key="ChipTables" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
+        <div class="drawer-group">
+          <button class="drawer-toggle">Gameweek ▾</button>
+          <div class="drawer-sub">
+            <button class="drawer-link" data-key="GameweekWinners" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true">Overview</button>
+            <button class="drawer-link" data-key="GameweekWeekWinners" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekWinnersTablesDashboard/GameweekWinnersTables?:showVizHome=no&:embed=true">Individual Gameweek Winners</button>
+            <button class="drawer-link" data-key="GameweekTables" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Full Gameweek Stat Tables</button>
+            <button class="drawer-link" data-key="ChipTables" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Booster Chip Tables</button>
+          </div>
+        </div>
 
         <div class="drawer-group">
           <button class="drawer-toggle">Transfers ▾</button>

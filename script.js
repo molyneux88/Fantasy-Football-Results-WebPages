@@ -19,6 +19,7 @@ const MIN_LOADER_DURATION = 700; // ms
 // Small map of heights (optional)
 const vizHeights = {
   "GameweekWinners": 1750,
+  "GameweekWeekWinners": 1700,
   "GameweekTables": 1000,
   "ChipTables": 2000,
   "TransfersOverview": 2500,
