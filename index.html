@@ -18,8 +18,9 @@
     <div class="header-left">
       <img src="logo.png" alt="Logo" class="logo" onerror="this.style.display='none'"/>
       <div class="brand">
-        <div class="brand-title">Fantasy Dashboard</div>
-        <div class="brand-sub">Transfers & Gameweeks</div>
+        <div class="brand-title">Fantasy FPL Stats Dashboard</div>
+        <div class="brand-sub">Gameweeks, Transfer & Personal</div>
+        
       </div>
     </div>
 
@@ -43,6 +44,8 @@
     <button id="hamburger" class="hamburger" aria-label="Open menu">
       <span></span><span></span><span></span>
     </button>
+
+    
   </header>
 
   <!-- SLIDING DRAWER (mobile menu) -->
@@ -51,6 +54,16 @@
       <div class="drawer-header">
         <img src="logo.png" alt="Logo" class="drawer-logo" onerror="this.style.display='none'"/>
         <button id="drawer-close" class="drawer-close" aria-label="Close menu">✕</button>
+
+        
+        <div class="season-selector">
+          <label for="seasonSelect">Season:</label>
+          <select id="seasonSelect">
+            <option value="24_25" selected>2024/25</option>
+            <option value="25_26">2025/26</option>
+          </select>
+        </div>
+
       </div>
 
       <nav class="drawer-nav">
@@ -83,6 +96,16 @@
               </div>
             </div>
 
+          </div>
+        </div>
+
+        <div class="drawer-group" data-group="personal">
+          <button class="drawer-toggle">Personal ▾</button>
+          <div class="drawer-sub">
+            <button class="drawer-link" data-key="PersonalOverview" data-url="https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true">Overview</button>
+            <button class="drawer-link" data-key="PersonalFavourite" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekWinnersTablesDashboard/GameweekWinnersTables?:showVizHome=no&:embed=true">Favourites</button>
+            <button class="drawer-link" data-key="PersonalGameweek" data-url="https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true">Personal Gameweek Stats</button>
+            <button class="drawer-link" data-key="PersonaPersonel" data-url="https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true">Player Stats</button>
           </div>
         </div>
       </nav>

@@ -109,27 +109,12 @@ function attachNavHandlers(){
     btn.addEventListener('click', (e)=>{
       e.stopPropagation();
 
-      const url = btn.getAttribute('data-url') || '';
-      const key = btn.getAttribute('data-key') || null;
+      const key = btn.getAttribute('data-key');
+      if (!key) return;
 
-      // remove active state from everything
-    document.querySelectorAll('.top-nav-btn, .drawer-link').forEach(el=>el.classList.remove('active'));
-
-    // set active on all elements that share the same data-key
-    if (key) {
-        document.querySelectorAll(`[data-key="${key}"]`).forEach(el=>el.classList.add('active'));
-    } else {
-        btn.classList.add('active');
-    }
-
-      // if no URL (placeholder), just close drawer and return
-      if (!url || url.trim() === '') {
-        closeDrawer();
-        return;
-      }
-
-      // load the viz
-      loadDashboard(url, key);
+      currentVizKey = key;
+      loadVizByKey(key);
+      closeDrawer();
 
       // close drawer on mobile after a selection for clean UX
       closeDrawer();
@@ -202,6 +187,7 @@ function loadDashboard(baseUrl, key){
 // Init on DOM ready
 document.addEventListener('DOMContentLoaded', ()=>{
   attachNavHandlers();
+  updatePersonalMenuState();
 
   // auto-load first data-url element (prefer top-nav if present)
   const firstTop = document.querySelector('.top-nav-btn[data-url]');
@@ -233,3 +219,117 @@ window.addEventListener('resize', ()=>{
     }
   }, 400);
 });
+
+const vizRegistry = {
+  "24_25": {
+    home: "https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true",
+
+    GameweekWinners: "https://public.tableau.com/views/FFBook-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true",
+    GameweekWeekWinners: "https://public.tableau.com/views/FantasyResults2024-GameweekWinnersTablesDashboard/GameweekWinnersTables?:showVizHome=no&:embed=true",
+    GameweekTables: "https://public.tableau.com/views/FantasyResults2024-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true",
+    ChipTables: "https://public.tableau.com/views/FantasyResults2024-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true",
+    
+    TransfersOverview: "https://public.tableau.com/views/FantasyResults2024-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersFootballers: "https://public.tableau.com/views/FantasyResults2024-TransferFootballersDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersPlayers: "https://public.tableau.com/views/FantasyResults2024-TransferPlayersDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersChipFree: "https://public.tableau.com/views/FantasyResults2024-TransferChipFreeDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersChip: "https://public.tableau.com/views/FantasyResults2024-TransferChipDashboard/TransferStats?:showVizHome=no&:embed=true",
+    
+    TransfersTimeHours: "https://public.tableau.com/views/FantasyResults2024-TransferHoursDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeDays: "https://public.tableau.com/views/FantasyResults2024-TransferDaysDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeMonths: "https://public.tableau.com/views/FantasyResults2024-TransferMonthsDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeDate: "https://public.tableau.com/views/FantasyResults2024-TransferTimeDateDashboard/TransferStats?:showVizHome=no&:embed=true",
+  },
+
+  "25_26": {
+    home: "https://public.tableau.com/views/FantasyResults2025-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true",
+
+    GameweekWinners: "https://public.tableau.com/views/FantasyResults2025-GameweekWinnersDashboard/GameweekTables?:showVizHome=no&:embed=true",
+    GameweekWeekWinners: "https://public.tableau.com/views/FantasyResults2025-GameweekWinnersTablesDashboard/GameweekWinnersTables?:showVizHome=no&:embed=true",
+    GameweekTables: "https://public.tableau.com/views/FantasyResults2025-GameweekTablesDashboard/GameweekTables?:showVizHome=no&:embed=true",
+    ChipTables: "https://public.tableau.com/views/FantasyResults2025-ChipsTablesDashboard/ChipTables?:showVizHome=no&:embed=true",
+    
+    TransfersOverview: "https://public.tableau.com/views/FantasyResults2025-TransferMasterDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersFootballers: "https://public.tableau.com/views/FantasyResults2025-TransferFootballersDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersPlayers: "https://public.tableau.com/views/FantasyResults2025-TransferPlayersDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersChipFree: "https://public.tableau.com/views/FantasyResults2025-TransferChipFreeDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersChip: "https://public.tableau.com/views/FantasyResults2025-TransferChipDashboard/TransferStats?:showVizHome=no&:embed=true",
+    
+    TransfersTimeHours: "https://public.tableau.com/views/FantasyResults2025-TransferHoursDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeDays: "https://public.tableau.com/views/FantasyResults2025-TransferDaysDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeMonths: "https://public.tableau.com/views/FantasyResults2025-TransferMonthsDashboard/TransferStats?:showVizHome=no&:embed=true",
+    TransfersTimeDate: "https://public.tableau.com/views/FantasyResults2025-TransferTimeDateDashboard/TransferStats?:showVizHome=no&:embed=true",
+
+    // New vizzes only exist in 25/26
+    PersonalOverview: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsMasterDashboard/Dashboard1?:showVizHome=no&:embed=true",
+    PersonalFavourite: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsFavouritesDashboard/Dashboard1?:showVizHome=no&:embed=true",
+    PersonalGameweek: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsGameweekPerformancesDashboard/Dashboard1?:showVizHome=no&:embed=true",
+    PersonaPersonel: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsPersonalPerformersDashboard/Dashboard1?:showVizHome=no&:embed=true"
+  }
+};
+
+function updatePersonalMenuState() {
+  const isEnabled = currentSeason === "25_26";
+
+  document.querySelectorAll('[data-group="personal"]').forEach(group => {
+    group.classList.toggle('disabled', !isEnabled);
+
+    // disable all buttons inside
+    group.querySelectorAll('button').forEach(btn => {
+      btn.disabled = !isEnabled;
+      btn.setAttribute('aria-disabled', String(!isEnabled));
+    });
+
+    // collapse drawer submenu if disabled
+    const sub = group.querySelector('.drawer-sub');
+    if (sub && !isEnabled) {
+      sub.style.display = 'none';
+    }
+  });
+}
+
+
+let currentSeason = "24_25";
+let currentVizKey = null;
+
+function loadVizByKey(vizKey) {
+  const seasonVizzes = vizRegistry[currentSeason];
+  let baseUrl;
+
+  if (seasonVizzes[vizKey]) {
+    baseUrl = seasonVizzes[vizKey];
+    currentVizKey = vizKey;
+  } else {
+    baseUrl = seasonVizzes.home;
+    currentVizKey = "home";
+  }
+
+  loadDashboard(baseUrl, currentVizKey);
+}
+
+
+document.querySelectorAll("[data-key]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const key = btn.dataset.key;
+    loadVizByKey(key);
+  });
+});
+
+const seasonSelect = document.getElementById("seasonSelect");
+
+seasonSelect.addEventListener("change", () => {
+  currentSeason = seasonSelect.value;
+
+  updatePersonalMenuState();
+
+  if (currentVizKey) {
+    loadVizByKey(currentVizKey);
+  } else {
+    loadVizByKey("home");
+  }
+});
+
+
+
+// Load default home dashboard on page load
+loadVizByKey("home");
