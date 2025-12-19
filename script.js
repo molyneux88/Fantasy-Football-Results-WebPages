@@ -18,6 +18,8 @@ const MIN_LOADER_DURATION = 700; // ms
 
 // Small map of heights (optional)
 const vizHeights = {
+
+  "home": 1400,
   "GameweekWinners": 1750,
   "GameweekWeekWinners": 1700,
   "GameweekTables": 1000,
@@ -31,6 +33,11 @@ const vizHeights = {
   "TransfersTimeDays": 1500,
   "TransfersTimeMonths": 1500,
   "TransfersTimeDate": 6000,
+  "PersonalOverview": 2575,
+  "PersonalFavourite": 1000,
+  "PersonalGameweek": 2300,
+  "PersonalPersonel": 2000,
+  "PersonalTransfers": 1000,
 };
 
 // utils
@@ -122,6 +129,20 @@ function attachNavHandlers(){
   });
 }
 
+function setActiveByKey(key) {
+  // clear existing active states
+  document
+    .querySelectorAll('.top-nav-btn, .drawer-link')
+    .forEach(el => el.classList.remove('active'));
+
+  if (!key) return;
+
+  // set active on all matching keys (desktop + drawer)
+  document
+    .querySelectorAll(`[data-key="${key}"]`)
+    .forEach(el => el.classList.add('active'));
+}
+
 // --------------------
 // Load a Tableau viz (keeps the same height map approach)
 function loadDashboard(baseUrl, key){
@@ -188,19 +209,6 @@ function loadDashboard(baseUrl, key){
 document.addEventListener('DOMContentLoaded', ()=>{
   attachNavHandlers();
   updatePersonalMenuState();
-
-  // auto-load first data-url element (prefer top-nav if present)
-  const firstTop = document.querySelector('.top-nav-btn[data-url]');
-  const firstDrawer = document.querySelector('.drawer-link[data-url]');
-  const first = firstTop || firstDrawer || document.querySelector('[data-url]');
-  if (first){
-    // set active for same-key elements
-    const key = first.getAttribute('data-key') || null;
-    if (key) document.querySelectorAll(`[data-key="${key}"]`).forEach(el=>el.classList.add('active'));
-    else first.classList.add('active');
-
-    loadDashboard(first.getAttribute('data-url'), key);
-  }
 });
 
 // --------------------
@@ -264,7 +272,8 @@ const vizRegistry = {
     PersonalOverview: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsMasterDashboard/Dashboard1?:showVizHome=no&:embed=true",
     PersonalFavourite: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsFavouritesDashboard/Dashboard1?:showVizHome=no&:embed=true",
     PersonalGameweek: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsGameweekPerformancesDashboard/Dashboard1?:showVizHome=no&:embed=true",
-    PersonaPersonel: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsPersonalPerformersDashboard/Dashboard1?:showVizHome=no&:embed=true"
+    PersonalPersonel: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsPersonalPerformersDashboard/Dashboard1?:showVizHome=no&:embed=true",
+    PersonalTransfers: "https://public.tableau.com/views/FantasyResults2025-PersonalStatsTransfersDashboard/Dashboard1?:showVizHome=no&:embed=true"
   }
 };
 
@@ -295,25 +304,24 @@ let currentVizKey = null;
 function loadVizByKey(vizKey) {
   const seasonVizzes = vizRegistry[currentSeason];
   let baseUrl;
+  let resolvedKey;
 
   if (seasonVizzes[vizKey]) {
     baseUrl = seasonVizzes[vizKey];
-    currentVizKey = vizKey;
+    resolvedKey = vizKey;
   } else {
     baseUrl = seasonVizzes.home;
-    currentVizKey = "home";
+    resolvedKey = "home";
   }
 
-  loadDashboard(baseUrl, currentVizKey);
+  currentVizKey = resolvedKey;
+
+  // ✅ apply green highlighting
+  setActiveByKey(resolvedKey);
+
+  // render viz
+  loadDashboard(baseUrl, resolvedKey);
 }
-
-
-document.querySelectorAll("[data-key]").forEach(btn => {
-  btn.addEventListener("click", () => {
-    const key = btn.dataset.key;
-    loadVizByKey(key);
-  });
-});
 
 const seasonSelect = document.getElementById("seasonSelect");
 
